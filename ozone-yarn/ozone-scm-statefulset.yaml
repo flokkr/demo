@@ -1,0 +1,54 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ozone-scm
+  labels:
+    app: ozone
+    component: scm
+spec:
+  selector:
+    matchLabels:
+      app: ozone
+      component: scm
+  serviceName: ozone-scm
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ozone
+        component: scm
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9876"
+        prometheus.io/path: /prom
+    spec:
+      initContainers:
+      - name: init
+        image: flokkr/ozone:dev-114ff4180
+        args:
+        - ozone
+        - scm
+        - --init
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+      containers:
+      - name: scm
+        image: flokkr/ozone:dev-114ff4180
+        args:
+        - ozone
+        - scm
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+        imagePullPolicy: IfNotPresent
+      volumes:
+      - name: data
+        emptyDir: {}

@@ -1,0 +1,34 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+      component: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+        component: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres
+        env:
+        - name: POSTGRES_PASSWORD
+          value: rootpwd
+        - name: POSTGRES_DB
+          value: metastore
+        - name: POSTGRES_USER
+          value: hive
+        volumeMounts:
+        - name: data
+          mountPath: /data
+      volumes:
+      - name: data
+        emptyDir: {}

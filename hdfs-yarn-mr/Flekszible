@@ -1,0 +1,33 @@
+import:
+ - path: hdfs
+ - path: hdfs-janitor
+#   transformations:
+#   - type: hdfs/persistence
+ - path: yarn
+# - path: robot
+#   transformations:
+#     - type: image
+#       image: flokkr/hadoop
+#     - type: Add
+#       path:
+#        - spec
+#        - template
+#        - spec
+#        - containers
+#        - executor
+#       value:
+#         args:
+#         - /tmp/robot/tester.sh
+#         - hdfs.robot
+#         - yarn.robot
+#     - type: Add
+#       path:
+#         - spec
+#         - template
+#         - spec
+#         - containers
+#         - executor
+#       value:
+#        envFrom:
+#        - configMapRef:
+#            name: hdfs-config

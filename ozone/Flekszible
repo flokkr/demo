@@ -1,0 +1,17 @@
+import:
+ - path: ozone
+   transformations:
+   - type: image
+     image: flokkr/ozone:dev-114ff4180
+   - type: ozone/onenode
+   - type: ozone/persistence
+   - type: add
+     path:
+       - spec
+       - template
+       - spec
+       - containers
+       - ".*"
+     value:
+        imagePullPolicy: IfNotPresent
+ 

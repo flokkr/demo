@@ -1,0 +1,45 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ozone-s3g
+  labels:
+    app: ozone
+    component: s3g
+spec:
+  selector:
+    matchLabels:
+      app: ozone
+      component: s3g
+  serviceName: ozone-s3g
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ozone
+        component: s3g
+    spec:
+      containers:
+      - name: s3g
+        image: flokkr/ozone:dev-114ff4180
+        args:
+        - ozone
+        - s3g
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+        imagePullPolicy: IfNotPresent
+      volumes:
+      - name: data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi

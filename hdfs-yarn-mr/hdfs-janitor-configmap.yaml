@@ -1,0 +1,11 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hdfs-janitor
+data:
+  janitor.sh: |-
+    set -x
+    echo "asd"
+    hdfs dfs -mkdir test
+    sleep 100000

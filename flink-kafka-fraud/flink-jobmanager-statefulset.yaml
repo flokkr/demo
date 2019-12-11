@@ -1,0 +1,34 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: flink-jobmanager
+  labels:
+    app: flink
+    component: jobmanager
+spec:
+  selector:
+    matchLabels:
+      app: flink
+      component: jobmanager
+  serviceName: flink-jobmanager
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: flink
+        component: jobmanager
+    spec:
+      containers:
+      - name: jobmanager
+        image: flokkr/flink
+        args:
+        - jobmanager.sh
+        - start-foreground
+        env:
+        - name: LAUNCHER_UPDATE
+          value: "true"
+        envFrom:
+        - configMapRef:
+            name: flink-config
+        imagePullPolicy: IfNotPresent

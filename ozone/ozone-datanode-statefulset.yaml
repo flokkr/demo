@@ -1,0 +1,51 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ozone-datanode
+  labels:
+    app: ozone
+    component: datanode
+spec:
+  selector:
+    matchLabels:
+      app: ozone
+      component: datanode
+  serviceName: ozone-datanode
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: ozone
+        component: datanode
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9882"
+        prometheus.io/path: /prom
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: datanode
+        image: flokkr/ozone:dev-114ff4180
+        args:
+        - ozone
+        - datanode
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+        imagePullPolicy: IfNotPresent
+      volumes:
+      - name: data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi

@@ -1,0 +1,19 @@
+source:
+    - path: ../..
+import:
+    - path: hdfs
+    - path: yarn
+      transformations:
+         - type: Add
+           path:
+             - spec
+             - template
+             - spec
+             - containers
+             - ".*"
+             - envFrom
+           value:
+               configMapRef:
+                  name: hdfs-config
+transformations:
+    - type: PublishStatefulSet

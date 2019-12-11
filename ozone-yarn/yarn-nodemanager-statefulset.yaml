@@ -1,0 +1,61 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: yarn-nodemanager
+  labels:
+    app: yarn
+    component: nodemanager
+spec:
+  serviceName: yarn-nodemanager
+  replicas: 3
+  updateStrategy:
+    type: RollingUpdate
+  podManagementPolicy: Parallel
+  selector:
+    matchLabels:
+      app: yarn
+      component: nodemanager
+  template:
+    metadata:
+      labels:
+        app: yarn
+        component: nodemanager
+    spec:
+      containers:
+      - name: yarn-nodemanager
+        image: flokkr/hadoop
+        args:
+        - yarn
+        - nodemanager
+        envFrom:
+        - configMapRef:
+            name: yarn-config
+        - configMapRef:
+            name: ozone-config
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: ozonefs
+          mountPath: /opt/ozonefs
+        env:
+        - name: HADOOP_CLASSPATH
+          value: /opt/ozonefs/hadoop-ozone-filesystem-lib-current-0.5.0-SNAPSHOT.jar
+        imagePullPolicy: IfNotPresent
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: ozonefs
+        emptyDir: {}
+      initContainers:
+      - name: ozonefscopy
+        image: flokkr/ozone:dev-114ff4180
+        command:
+        - bash
+        - -c
+        - cp /opt/ozone/share/ozone/lib/hadoop-ozone-filesystem-lib-current-0.5.0-SNAPSHOT.jar
+          /opt/ozonefs
+        volumeMounts:
+        - name: ozonefs
+          mountPath: /opt/ozonefs
+        imagePullPolicy: IfNotPresent

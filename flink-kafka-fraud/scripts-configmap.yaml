@@ -1,0 +1,17 @@
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scripts
+data:
+  consumer.sh: |
+    #!/usr/bin/env bash
+    kafka-console-consumer.sh --bootstrap-server kafka-broker-0.kafka-broker:9092 --topic test
+  producer.sh: |+
+    #!/usr/bin/env bash
+
+    while true; do
+       date | tee | kafka-console-producer.sh --topic test --broker-list kafka-broker-0.kafka-broker:9092
+       sleep 1
+    done
+

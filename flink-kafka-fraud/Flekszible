@@ -1,0 +1,18 @@
+import:
+ - path: zookeeper
+   transformations:
+   - type: zookeeper/scale
+     replicas: 3
+ - path: kafka
+ - path: kafka-demo
+ - path: flink
+   transformations:
+   - type: add
+     path: 
+       - spec
+       - template
+       - spec 
+       - containers
+       - ".*"
+     value:
+       imagePullPolicy: IfNotPresent

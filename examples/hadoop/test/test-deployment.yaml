@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hadoop-test
+  labels:
+    app: hadoop
+    service: test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hadoop
+      service: test
+  template:
+    metadata:
+      labels:
+        app: hadoop
+        service: test
+    spec:
+      containers:
+      - name: test
+        image: elek/hadoop-test
+        imagePullPolicy: Always
+        envFrom:
+            - configMapRef:
+                name: hdfs-config
+            - configMapRef:
+                name: yarn-config
+

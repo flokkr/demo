@@ -1,0 +1,65 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ozone-om
+  labels:
+    app: ozone
+    component: om
+spec:
+  selector:
+    matchLabels:
+      app: ozone
+      component: om
+  serviceName: ozone-om
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ozone
+        component: om
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9874"
+        prometheus.io/path: /prom
+    spec:
+      initContainers:
+      - name: init
+        image: flokkr/ozone:dev-114ff4180
+        args:
+        - ozone
+        - om
+        - --init
+        env:
+        - name: WAITFOR
+          value: ozone-scm-0.ozone-scm:9876
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+      containers:
+      - name: om
+        image: flokkr/ozone:dev-114ff4180
+        args:
+        - ozone
+        - om
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+        imagePullPolicy: IfNotPresent
+      volumes:
+      - name: data
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 2Gi

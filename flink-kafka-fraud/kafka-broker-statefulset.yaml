@@ -1,0 +1,36 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka-broker
+spec:
+  serviceName: kafka-broker
+  replicas: 1
+  updateStrategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: kafka
+      component: broker
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: kafka
+        component: broker
+    spec:
+      containers:
+      - name: kafka-broker
+        image: flokkr/kafka
+        env:
+        - name: WAITFOR
+          value: zookeeper-0.zookeeper:2181
+        envFrom:
+        - configMapRef:
+            name: kafka-config
+        args:
+        - kafka-server-start.sh
+        - /opt/kafka/config/server.cfg
+      volumes:
+      - name: data
+        emptyDir: {}

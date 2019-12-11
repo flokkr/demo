@@ -1,0 +1,15 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: hive-hiveserver2
+spec:
+  clusterIP: None
+  ports:
+  - port: 10002
+    name: web
+  - port: 10000
+    name: hive
+  selector:
+    app: hive
+    component: hiveserver2
