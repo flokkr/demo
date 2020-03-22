@@ -1,0 +1,42 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark
+  labels:
+    app: spark
+    component: console
+spec:
+  selector:
+    matchLabels:
+      app: spark
+      component: console
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: spark
+        component: console
+    spec:
+      containers:
+      - name: spark
+        image: flokkr/spark
+        args:
+        - sleep
+        - "10000000"
+        volumeMounts:
+        - name: hadoop
+          mountPath: /opt/hadoop-dist
+      initContainers:
+      - name: hadoopcopy
+        image: flokkr/hadoop
+        command:
+        - bash
+        - -c
+        - cp -r /opt/hadoop/* /opt/hadoop-dist/
+        volumeMounts:
+        - name: hadoop
+          mountPath: /opt/hadoop-dist
+      volumes:
+      - name: hadoop
+        emptyDir: {}

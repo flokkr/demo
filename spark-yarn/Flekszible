@@ -1,0 +1,16 @@
+import:
+  - path: hadoop
+  - path: spark
+    transformations:
+    - type: hadoop/distribute
+      image: flokkr/hadoop
+# - path: ozone
+#   transformations:
+#   - type: image
+#     image: flokkr/ozone:dev-114ff4180
+#   - type: ozone/onenode
+# - path: yarn
+#   transformations:
+#   - type: ozone/ozonefs
+#     image: flokkr/ozone:dev-114ff4180
+ 
