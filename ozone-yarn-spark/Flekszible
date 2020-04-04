@@ -1,29 +1,44 @@
+source:
+  - url: git::https://github.com/flokkr/k8s.git
+  - url: git::https://github.com/flokkr/infra-flekszible.git
+  - url: git::https://github.com/elek/ozone-flekszible.git
+  - path: ../flekszible
 import:
- - path: ozone
-   transformations:
-   - type: image
-     image: flokkr/ozone:dev-114ff4180
-   - type: ozone/onenode
-   - type: add
-     path:
-       - spec
-       - template
-       - spec
-       - containers
-       - ".*"
-     value:
-        imagePullPolicy: IfNotPresent
- - path: yarn
-   transformations:
-   - type: ozone/ozonefs
-     image: flokkr/ozone:dev-114ff4180
-   - type: add
-     path:
-       - spec
-       - template
-       - spec
-       - (containers|initContainers)
-       - ".*"
-     value:
-        imagePullPolicy: IfNotPresent
- 
+  - path: util
+  - path: hadoop
+  - path: spark
+    destination: spark
+    transformations:
+    - type: perftest/mountfile
+      configmap: spark-env
+      filename: spark-env.sh
+      destination: /opt/spark/conf
+    - type: image
+      image: flokkr/spark:2.4.4
+    - type: hadoop/distribute
+      image: flokkr/hadoop
+    - type: ozone/client-config
+    - type: ozone/ozonefs
+      image: elek/ozone:0.5.0-rc2-beta
+    - type: yarn/config
+  - path: mapreduce
+    destination: mr
+    transformations:
+    - type: ozone/ozonefs
+      image: elek/ozone:0.5.0-rc2-beta
+    - type: perftest/runconfigmap
+      configmap:  teragen-testscript
+      scriptname: teragen.sh
+  - path: yarn
+    destination: yarn
+    transformations:
+    - type: ozone/ozonefs
+      image: elek/ozone:0.5.0-rc2-beta
+    - type: ozone/client-config
+    - type: PublishService
+  - path: ozone
+    destination: ozone
+    transformations:
+    - type: perftest/tuning
+    - type: image
+      image: elek/ozone:0.5.0-rc2-beta

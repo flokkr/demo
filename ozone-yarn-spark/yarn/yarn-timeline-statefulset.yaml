@@ -2,12 +2,12 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: yarn-resourcemanager
+  name: yarn-timeline
   labels:
     app: yarn
-    component: resourcemanager
+    component: timeline
 spec:
-  serviceName: yarn-resourcemanager
+  serviceName: yarn-timeline
   replicas: 1
   updateStrategy:
     type: RollingUpdate
@@ -15,48 +15,50 @@ spec:
   selector:
     matchLabels:
       app: yarn
-      component: resourcemanager
+      component: timeline
   template:
     metadata:
       labels:
         app: yarn
-        component: resourcemanager
+        component: timeline
     spec:
       containers:
-      - name: yarn-resourcemanager
+      - name: yarn-timeline
         image: flokkr/hadoop
         args:
         - yarn
-        - resourcemanager
+        - timelineserver
         envFrom:
         - configMapRef:
             name: yarn-config
         - configMapRef:
+            name: ozone-client-config
+        - configMapRef:
             name: ozone-config
         volumeMounts:
+        - name: data
+          mountPath: /data
         - name: ozonefs
           mountPath: /opt/ozonefs
         env:
         - name: HADOOP_CLASSPATH
-          value: /opt/ozonefs/hadoop-ozone-filesystem-lib-current-0.5.0-SNAPSHOT.jar
-        imagePullPolicy: IfNotPresent
+          value: /opt/ozonefs/hadoop-ozone-filesystem-lib-current-0.5.0-beta.jar
       volumes:
-      - name: config
-        configMap:
-          name: yarn-config
       - name: data
         emptyDir: {}
       - name: ozonefs
         emptyDir: {}
       initContainers:
       - name: ozonefscopy
-        image: flokkr/ozone:dev-114ff4180
+        image: elek/ozone:0.5.0-rc2-beta
         command:
         - bash
         - -c
-        - cp /opt/ozone/share/ozone/lib/hadoop-ozone-filesystem-lib-current-0.5.0-SNAPSHOT.jar
+        - cp /opt/hadoop/share/ozone/lib/hadoop-ozone-filesystem-lib-current-0.5.0-beta.jar
           /opt/ozonefs
         volumeMounts:
         - name: ozonefs
           mountPath: /opt/ozonefs
-        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: ozone-client-config

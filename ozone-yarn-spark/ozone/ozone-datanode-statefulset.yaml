@@ -1,0 +1,56 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ozone-datanode
+  labels:
+    app: ozone
+    component: datanode
+spec:
+  selector:
+    matchLabels:
+      app: ozone
+      component: datanode
+  serviceName: ozone-datanode
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: ozone
+        component: datanode
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9882"
+        prometheus.io/path: /prom
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: component
+                operator: In
+                values:
+                - datanode
+              - key: app
+                operator: In
+                values:
+                - ozone
+            topologyKey: kubernetes.io/hostname
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: datanode
+        image: elek/ozone:0.5.0-rc2-beta
+        args:
+        - ozone
+        - datanode
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+      volumes:
+      - name: data
+        emptyDir: {}

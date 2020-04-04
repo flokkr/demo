@@ -2,42 +2,52 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: ozone-datanode
+  name: ozone-scm
   labels:
     app: ozone
-    component: datanode
+    component: scm
 spec:
   selector:
     matchLabels:
       app: ozone
-      component: datanode
-  serviceName: ozone-datanode
-  replicas: 3
+      component: scm
+  serviceName: ozone-scm
+  replicas: 1
   template:
     metadata:
       labels:
         app: ozone
-        component: datanode
+        component: scm
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "9882"
+        prometheus.io/port: "9876"
         prometheus.io/path: /prom
     spec:
-      securityContext:
-        fsGroup: 1000
-      containers:
-      - name: datanode
-        image: flokkr/ozone:dev-114ff4180
+      initContainers:
+      - name: init
+        image: elek/ozone:0.5.0-rc2-beta
         args:
         - ozone
-        - datanode
+        - scm
+        - --init
         volumeMounts:
         - name: data
           mountPath: /data
         envFrom:
         - configMapRef:
             name: ozone-config
-        imagePullPolicy: IfNotPresent
+      containers:
+      - name: scm
+        image: elek/ozone:0.5.0-rc2-beta
+        args:
+        - ozone
+        - scm
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        envFrom:
+        - configMapRef:
+            name: ozone-config
       volumes:
       - name: data
         emptyDir: {}

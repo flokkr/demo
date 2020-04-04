@@ -28,9 +28,14 @@ spec:
         args:
         - yarn
         - nodemanager
+        env:
+        - name: HADOOP_CLASSPATH
+          value: /opt/ozonefs/hadoop-ozone-filesystem-lib-current-0.5.0-beta.jar
         envFrom:
         - configMapRef:
             name: yarn-config
+        - configMapRef:
+            name: ozone-client-config
         - configMapRef:
             name: ozone-config
         volumeMounts:
@@ -38,10 +43,6 @@ spec:
           mountPath: /data
         - name: ozonefs
           mountPath: /opt/ozonefs
-        env:
-        - name: HADOOP_CLASSPATH
-          value: /opt/ozonefs/hadoop-ozone-filesystem-lib-current-0.5.0-SNAPSHOT.jar
-        imagePullPolicy: IfNotPresent
       volumes:
       - name: data
         emptyDir: {}
@@ -49,13 +50,15 @@ spec:
         emptyDir: {}
       initContainers:
       - name: ozonefscopy
-        image: flokkr/ozone:dev-114ff4180
+        image: elek/ozone:0.5.0-rc2-beta
         command:
         - bash
         - -c
-        - cp /opt/ozone/share/ozone/lib/hadoop-ozone-filesystem-lib-current-0.5.0-SNAPSHOT.jar
+        - cp /opt/hadoop/share/ozone/lib/hadoop-ozone-filesystem-lib-current-0.5.0-beta.jar
           /opt/ozonefs
         volumeMounts:
         - name: ozonefs
           mountPath: /opt/ozonefs
-        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: ozone-client-config

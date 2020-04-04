@@ -1,0 +1,81 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark
+  labels:
+    app: spark
+    component: console
+spec:
+  selector:
+    matchLabels:
+      app: spark
+      component: console
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: spark
+        component: console
+    spec:
+      containers:
+      - name: spark
+        image: flokkr/spark:2.4.4
+        args:
+        - sleep
+        - "10000000"
+        volumeMounts:
+        - name: script
+          mountPath: /opt/spark/conf/spark-env.sh
+          subPath: spark-env.sh
+        - name: hadoop
+          mountPath: /opt/hadoop
+        - name: ozonefs
+          mountPath: /opt/ozonefs
+        envFrom:
+        - configMapRef:
+            name: ozone-client-config
+        - configMapRef:
+            name: yarn-config
+        env:
+        - name: HADOOP_CLASSPATH
+          value: /opt/ozonefs/hadoop-ozone-filesystem-lib-current-0.5.0-beta.jar
+      volumes:
+      - name: script
+        configMap:
+          name: spark-env
+          defaultMode: 493
+      - name: hadoop
+        emptyDir: {}
+      - name: ozonefs
+        emptyDir: {}
+      initContainers:
+      - name: hadoopcopy
+        image: flokkr/hadoop
+        command:
+        - bash
+        - -c
+        - cp -r /opt/hadoop/* /opt/hadoop-dist/
+        volumeMounts:
+        - name: hadoop
+          mountPath: /opt/hadoop-dist
+        - name: ozonefs
+          mountPath: /opt/ozonefs
+        envFrom:
+        - configMapRef:
+            name: ozone-client-config
+        - configMapRef:
+            name: yarn-config
+      - name: ozonefscopy
+        image: elek/ozone:0.5.0-rc2-beta
+        command:
+        - bash
+        - -c
+        - cp /opt/hadoop/share/ozone/lib/hadoop-ozone-filesystem-lib-current-0.5.0-beta.jar
+          /opt/ozonefs
+        volumeMounts:
+        - name: ozonefs
+          mountPath: /opt/ozonefs
+        envFrom:
+        - configMapRef:
+            name: yarn-config

@@ -1,0 +1,59 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yarn-teragen
+  labels:
+    app: yarn
+    component: teragen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yarn
+      component: teragen
+  template:
+    metadata:
+      labels:
+        app: yarn
+        component: teragen
+    spec:
+      containers:
+      - name: teragen
+        image: flokkr/hadoop
+        envFrom:
+        - configMapRef:
+            name: yarn-config
+        - configMapRef:
+            name: ozone-config
+        volumeMounts:
+        - name: ozonefs
+          mountPath: /opt/ozonefs
+        - name: script
+          mountPath: /opt/script/teragen.sh
+          subPath: teragen.sh
+        env:
+        - name: HADOOP_CLASSPATH
+          value: /opt/ozonefs/hadoop-ozone-filesystem-lib-current-0.5.0-beta.jar
+        args:
+        - /opt/script/teragen.sh
+      nodeSelector:
+        partition: upper
+      initContainers:
+      - name: ozonefscopy
+        image: elek/ozone:0.5.0-rc2-beta
+        command:
+        - bash
+        - -c
+        - cp /opt/hadoop/share/ozone/lib/hadoop-ozone-filesystem-lib-current-0.5.0-beta.jar
+          /opt/ozonefs
+        volumeMounts:
+        - name: ozonefs
+          mountPath: /opt/ozonefs
+      volumes:
+      - name: ozonefs
+        emptyDir: {}
+      - name: script
+        configMap:
+          name: teragen-testscript
+          defaultMode: 493
