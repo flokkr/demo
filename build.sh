@@ -7,4 +7,5 @@ for file in ${files[@]}; do
     echo "Generating files from/to $DIR"
     cd $DIR
     flekszible generate
+    cd -
 done
