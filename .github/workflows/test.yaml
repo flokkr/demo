@@ -9,7 +9,10 @@ jobs:
       - name: Install k3s
         run: curl -sfL https://get.k3s.io | sh -
       - name: Copy kubeconfig
-        run: sudo mkdir ~/.kube && sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+        run: |
+            sudo mkdir ~/.kube
+            sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+            sudo chown $(id -u) ~/.kube/config
       - name: Install flekszible
         run: |
            cd /tmp
