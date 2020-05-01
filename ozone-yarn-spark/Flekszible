@@ -4,6 +4,7 @@ source:
   - url: git::https://github.com/elek/ozone-flekszible.git
   - path: ../flekszible
 import:
+  - path: demoutils
   - path: util
   - path: hadoop
   - path: spark

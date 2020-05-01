@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: yarn-teragen
+  labels:
+    app: yarn
+    component: teragen
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yarn
+      component: teragen
+  template:
+    metadata:
+      labels:
+        app: yarn
+        component: teragen
+    spec:
+      containers:
+      - name: teragen
+        image: flokkr/hadoop
+        envFrom:
+        - configMapRef:
+            name: yarn-config
+      nodeSelector:
+          partition: upper

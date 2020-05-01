@@ -5,7 +5,6 @@ metadata:
   name: ozone-config
 data:
   CORE-SITE.XML_fs.defaultFS: o3fs://bucket1.vol1.ozone-om-0.ozone-om/
-  CORE-SITE.XML_fs.o3fs.impl: org.apache.hadoop.fs.ozone.BasicOzoneFileSystem
   CORE-SITE.xml_fs.AbstractFileSystem.o3fs.impl: org.apache.hadoop.fs.ozone.OzFs
   OZONE-SITE.XML_hdds.datanode.dir: /data/storage
   OZONE-SITE.XML_ozone.scm.datanode.id.dir: /data

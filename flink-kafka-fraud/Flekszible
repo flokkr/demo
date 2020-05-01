@@ -1,4 +1,8 @@
+source:
+- path: ../flekszible
+- url: github.com/flokkr/k8s
 import:
+ - path: demoutils
  - path: zookeeper
    transformations:
    - type: zookeeper/scale
@@ -11,7 +15,7 @@ import:
      path: 
        - spec
        - template
-       - spec 
+       - spec
        - containers
        - ".*"
      value:

@@ -1,0 +1,32 @@
+name: perftest/mountfile
+parameters:
+  - name: configmap
+    type: string
+  - name: filename
+    type: string
+  - name: destination
+    type: string
+---
+- type: add
+  path:
+  - spec
+  - template
+  - spec
+  - containers
+  - .*
+  - volumeMounts
+  value:
+      - name: script
+        mountPath: {{.destination}}/{{.filename}}
+        subPath: {{.filename}}
+- type: add
+  path:
+  - spec
+  - template
+  - spec
+  - volumes
+  value:
+      - name: script
+        configMap:
+           name: {{.configmap}}
+           defaultMode: 0755

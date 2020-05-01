@@ -5,7 +5,7 @@ metadata:
   name: zookeeper
 spec:
   serviceName: zookeeper
-  replicas: 3
+  replicas: 1
   updateStrategy:
     type: RollingUpdate
   selector:

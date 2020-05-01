@@ -30,7 +30,7 @@ spec:
         - nodemanager
         env:
         - name: HADOOP_CLASSPATH
-          value: /opt/ozonefs/hadoop-ozone-filesystem-lib-current-0.5.0-beta.jar
+          value: /opt/ozonefs/hadoop-ozone-filesystem-lib-current-0.5.0-SNAPSHOT.jar
         envFrom:
         - configMapRef:
             name: yarn-config
@@ -54,7 +54,7 @@ spec:
         command:
         - bash
         - -c
-        - cp /opt/hadoop/share/ozone/lib/hadoop-ozone-filesystem-lib-current-0.5.0-beta.jar
+        - cp /opt/ozone/share/ozone/lib/hadoop-ozone-filesystem-lib-current-0.5.0-SNAPSHOT.jar
           /opt/ozonefs
         volumeMounts:
         - name: ozonefs

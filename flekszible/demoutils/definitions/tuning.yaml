@@ -1,0 +1,15 @@
+name: perftest/tuning
+---
+- type: add
+  trigger:
+     metadata:
+        name: ozone-config
+  path:
+    - data
+  value:
+     OZONE-SITE.XML_ozone.om.handler.count.key: "250"
+     OZONE-SITE.XML_ozone.scm.handler.count.key: "250"
+     OZONE-SITE.XML_dfs.ratis.client.request.retry.interval: 15s
+     OZONE-SITE.XML_hdds.ratis.raft.server.write.element-limit: "4096"
+     OZONE-SITE.XML_hdds.datanode.df.refresh.period: 60m
+     OZONE-SITE.XML_hdds.datanode.du.factory.classname: org.apache.hadoop.hdds.fs.DedicatedDiskSpaceUsageFactory

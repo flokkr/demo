@@ -1,0 +1,40 @@
+name: perftest/runconfigmap
+parameters:
+  - name: configmap
+    type: string
+  - name: scriptname
+    type: string
+---
+- type: add
+  path:
+  - spec
+  - template
+  - spec
+  - containers
+  - .*
+  value:
+    args:
+      - /opt/script/{{.scriptname}}
+- type: add
+  path:
+  - spec
+  - template
+  - spec
+  - containers
+  - .*
+  - volumeMounts
+  value:
+      - name: script
+        mountPath: /opt/script/{{.scriptname}}
+        subPath: {{.scriptname}}
+- type: add
+  path:
+  - spec
+  - template
+  - spec
+  - volumes
+  value:
+      - name: script
+        configMap:
+           name: {{.configmap}}
+           defaultMode: 0755

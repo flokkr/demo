@@ -1,3 +1,5 @@
+source:
+- url: github.com/flokkr/k8s
 import:
   - path: hadoop
   - path: spark
