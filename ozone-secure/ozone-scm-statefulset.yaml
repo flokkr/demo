@@ -1,0 +1,89 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ozone-scm
+  labels:
+    app: ozone
+    component: scm
+spec:
+  selector:
+    matchLabels:
+      app: ozone
+      component: scm
+  serviceName: ozone-scm
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ozone
+        component: scm
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9876"
+        prometheus.io/path: /prom
+    spec:
+      initContainers:
+      - name: init
+        image: elek/ozone-runner
+        args:
+        - ozone
+        - scm
+        - --init
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: ozone-dev
+          mountPath: /opt/ozone
+        - name: keytabs
+          mountPath: /etc/keystore
+        - name: ssl
+          mountPath: /etc/ssl
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+      - name: script
+        image: flokkr/base:36
+        args:
+        - /opt/script/sslconvert.sh
+        volumeMounts:
+        - name: script
+          mountPath: /opt/script/sslconvert.sh
+          subPath: sslconvert.sh
+        - name: keytabs
+          mountPath: /etc/keystore
+        - name: ssl
+          mountPath: /etc/ssl
+      containers:
+      - name: scm
+        image: elek/ozone-runner
+        args:
+        - ozone
+        - scm
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: ozone-dev
+          mountPath: /opt/ozone
+        - name: keytabs
+          mountPath: /etc/keystore
+        - name: ssl
+          mountPath: /etc/ssl
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: ozone-dev
+        hostPath:
+          path: /home/elek/projects/ozone/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT
+      - name: script
+        configMap:
+          name: ozone-sslconf
+          defaultMode: 493
+      - name: keytabs
+        emptyDir: {}
+      - name: ssl
+        secret:
+          secretName: ozone-scm-tls

@@ -1,0 +1,47 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ozone-datanode
+  labels:
+    app: ozone
+    component: datanode
+spec:
+  selector:
+    matchLabels:
+      app: ozone
+      component: datanode
+  serviceName: ozone-datanode
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: ozone
+        component: datanode
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9882"
+        prometheus.io/path: /prom
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: datanode
+        image: elek/ozone-runner
+        args:
+        - ozone
+        - datanode
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: ozone-dev
+          mountPath: /opt/ozone
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: ozone-dev
+        hostPath:
+          path: /home/elek/projects/ozone/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT

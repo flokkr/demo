@@ -1,0 +1,18 @@
+
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: ozone-ca-root
+spec:
+  secretName: ozone-ca-root
+  duration: 2160h
+  renewBefore: 360h
+  organization:
+  - ozone
+  commonName: root
+  isCA: true
+  keySize: 4096
+  issuerRef:
+    name: ozone-ca-selfsigner
+    kind: Issuer
+    group: cert-manager.io

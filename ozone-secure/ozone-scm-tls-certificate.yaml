@@ -1,0 +1,25 @@
+
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: ozone-scm-tls
+spec:
+  secretName: ozone-scm-tls
+  duration: 2160h
+  renewBefore: 360h
+  organization:
+  - ozone
+  commonName: scm
+  isCA: false
+  keySize: 2048
+  keyAlgorithm: rsa
+  keyEncoding: pkcs1
+  usages:
+  - server auth
+  - client auth
+  dnsNames:
+  - ozone-scm-0.ozone-scm
+  issuerRef:
+    name: ozone-ca-issuer
+    kind: Issuer
+    group: cert-manager.io

@@ -1,0 +1,40 @@
+source:
+- url: github.com/flokkr/ozone-flekszible
+- url: github.com/flokkr/infra-flekszible
+import:
+ - path: util
+ - path: ozone/tls
+ - path: ozonedev
+ - path: ozone
+   transformations:
+   - type: PublishStatefulSet
+   - type: ozone/dev
+   - type: ozone/onenode
+   - type: ozone/sslconfig
+   - type: ozone/sslimport
+     trigger:
+        metadata:
+          name: ozone-s3g
+   - type: ozone/sslimport
+     trigger:
+        metadata:
+          name: ozone-scm
+   - type: ozone/sslimport
+     trigger:
+        metadata:
+          name: ozone-om
+   - type: ozone/sslmount
+     trigger:
+        metadata:
+          name: ozone-s3g
+     secretname: ozone-s3g-tls
+   - type: ozone/sslmount
+     trigger:
+        metadata:
+          name: ozone-scm
+     secretname: ozone-scm-tls
+   - type: ozone/sslmount
+     trigger:
+        metadata:
+          name: ozone-om
+     secretname: ozone-om-tls

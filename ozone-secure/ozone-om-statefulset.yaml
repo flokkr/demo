@@ -1,0 +1,92 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ozone-om
+  labels:
+    app: ozone
+    component: om
+spec:
+  selector:
+    matchLabels:
+      app: ozone
+      component: om
+  serviceName: ozone-om
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ozone
+        component: om
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9874"
+        prometheus.io/path: /prom
+    spec:
+      initContainers:
+      - name: init
+        image: elek/ozone-runner
+        args:
+        - ozone
+        - om
+        - --init
+        env:
+        - name: WAITFOR
+          value: ozone-scm-0.ozone-scm:9876
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: ozone-dev
+          mountPath: /opt/ozone
+        - name: keytabs
+          mountPath: /etc/keystore
+        - name: ssl
+          mountPath: /etc/ssl
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+      - name: script
+        image: flokkr/base:36
+        args:
+        - /opt/script/sslconvert.sh
+        volumeMounts:
+        - name: script
+          mountPath: /opt/script/sslconvert.sh
+          subPath: sslconvert.sh
+        - name: keytabs
+          mountPath: /etc/keystore
+        - name: ssl
+          mountPath: /etc/ssl
+      containers:
+      - name: om
+        image: elek/ozone-runner
+        args:
+        - ozone
+        - om
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: ozone-dev
+          mountPath: /opt/ozone
+        - name: keytabs
+          mountPath: /etc/keystore
+        - name: ssl
+          mountPath: /etc/ssl
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: ozone-dev
+        hostPath:
+          path: /home/elek/projects/ozone/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT
+      - name: script
+        configMap:
+          name: ozone-sslconf
+          defaultMode: 493
+      - name: keytabs
+        emptyDir: {}
+      - name: ssl
+        secret:
+          secretName: ozone-om-tls

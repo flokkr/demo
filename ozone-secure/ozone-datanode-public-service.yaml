@@ -1,0 +1,13 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: ozone-datanode-public
+spec:
+  ports:
+  - port: 9870
+    name: rpc
+  selector:
+    app: ozone
+    component: datanode
+  type: NodePort

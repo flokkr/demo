@@ -1,0 +1,25 @@
+
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: ozone-om-tls
+spec:
+  secretName: ozone-om-tls
+  duration: 2160h
+  renewBefore: 360h
+  organization:
+  - ozone
+  commonName: om
+  isCA: false
+  keySize: 2048
+  keyAlgorithm: rsa
+  keyEncoding: pkcs1
+  usages:
+  - server auth
+  - client auth
+  dnsNames:
+  - ozone-om-0.ozone-om
+  issuerRef:
+    name: ozone-ca-issuer
+    kind: Issuer
+    group: cert-manager.io

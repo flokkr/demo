@@ -1,0 +1,67 @@
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ozone-s3g
+  labels:
+    app: ozone
+    component: s3g
+spec:
+  selector:
+    matchLabels:
+      app: ozone
+      component: s3g
+  serviceName: ozone-s3g
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ozone
+        component: s3g
+    spec:
+      containers:
+      - name: s3g
+        image: elek/ozone-runner
+        args:
+        - ozone
+        - s3g
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: ozone-dev
+          mountPath: /opt/ozone
+        - name: keytabs
+          mountPath: /etc/keystore
+        - name: ssl
+          mountPath: /etc/ssl
+        envFrom:
+        - configMapRef:
+            name: ozone-config
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: ozone-dev
+        hostPath:
+          path: /home/elek/projects/ozone/hadoop-ozone/dist/target/ozone-0.5.0-SNAPSHOT
+      - name: script
+        configMap:
+          name: ozone-sslconf
+          defaultMode: 493
+      - name: keytabs
+        emptyDir: {}
+      - name: ssl
+        secret:
+          secretName: ozone-s3g-tls
+      initContainers:
+      - name: script
+        image: flokkr/base:36
+        args:
+        - /opt/script/sslconvert.sh
+        volumeMounts:
+        - name: script
+          mountPath: /opt/script/sslconvert.sh
+          subPath: sslconvert.sh
+        - name: keytabs
+          mountPath: /etc/keystore
+        - name: ssl
+          mountPath: /etc/ssl
