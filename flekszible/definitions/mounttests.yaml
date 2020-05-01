@@ -1,0 +1,27 @@
+name: mounttests
+description: Run Ozone from local build via docker volume mounts
+parameter:
+  - name: path
+    type: string
+---
+- type: add
+  path:
+    - spec
+    - template
+    - spec
+    - volumes
+  value:
+    - name: smoketest
+      hostPath:
+        path: {{.path}}
+- type: add
+  path:
+      - spec
+      - template
+      - spec
+      - (initC|c)ontainers
+      - .*
+      - volumeMounts
+  value:
+      - name: smoketest
+        mountPath: /opt/smoketest
