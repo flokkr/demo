@@ -1,0 +1,16 @@
+on:
+  - push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install flekszible
+        run: |
+           wget https://github.com/elek/flekszible/releases/download/v1.6.1/flekszible_1.6.1_Linux_x86_64.tar.gz -O - | tar -zx
+           chmod +x flekszible
+           sudo mv flekszible /usr/bin/flekszible
+      - name: run build
+        run: |
+          ./build.sh
