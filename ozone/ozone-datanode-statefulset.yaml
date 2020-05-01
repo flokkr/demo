@@ -27,7 +27,7 @@ spec:
         fsGroup: 1000
       containers:
       - name: datanode
-        image: flokkr/ozone:dev-114ff4180
+        image: flokkr/ozone:0.5.0-beta
         args:
         - ozone
         - datanode
@@ -37,15 +37,7 @@ spec:
         envFrom:
         - configMapRef:
             name: ozone-config
-        imagePullPolicy: IfNotPresent
       volumes:
       - name: data
-  volumeClaimTemplates:
-  - metadata:
-      name: data
-    spec:
-      accessModes:
-      - ReadWriteOnce
-      resources:
-        requests:
-          storage: 2Gi
+        emptyDir:
+          medium: Memory

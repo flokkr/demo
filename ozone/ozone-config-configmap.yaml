@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: ozone-config
 data:
-  CORE-SITE.XML_fs.defaultFS: o3fs://bucket1.vol1.om-0.om/
+  CORE-SITE.XML_fs.defaultFS: o3fs://bucket1.vol1.ozone-om-0.ozone-om/
   CORE-SITE.xml_fs.AbstractFileSystem.o3fs.impl: org.apache.hadoop.fs.ozone.OzFs
   OZONE-SITE.XML_hdds.datanode.dir: /data/storage
   OZONE-SITE.XML_ozone.scm.datanode.id.dir: /data
@@ -14,9 +14,11 @@ data:
   OZONE-SITE.XML_ozone.scm.client.address: ozone-scm-0.ozone-scm
   OZONE-SITE.XML_ozone.scm.names: ozone-scm-0.ozone-scm
   OZONE-SITE.XML_ozone.enabled: "true"
+  OZONE-SITE.XML_hdds.scm.safemode.min.datanode: "3"
   LOG4J.PROPERTIES_log4j.rootLogger: INFO, stdout
   LOG4J.PROPERTIES_log4j.appender.stdout: org.apache.log4j.ConsoleAppender
   LOG4J.PROPERTIES_log4j.appender.stdout.layout: org.apache.log4j.PatternLayout
   LOG4J.PROPERTIES_log4j.appender.stdout.layout.ConversionPattern: '%d{yyyy-MM-dd
     HH:mm:ss} %-5p %c{1}:%L - %m%n'
   MAPRED-SITE.XML_mapreduce.application.classpath: /opt/hadoop/share/hadoop/mapreduce/*:/opt/hadoop/share/hadoop/mapreduce/lib/*:/opt/ozonefs/hadoop-ozone-filesystem-lib-current-0.5.0-SNAPSHOT.jar
+  OZONE-SITE.XML_ozone.scm.container.size: 1GB

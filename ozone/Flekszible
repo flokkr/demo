@@ -1,17 +1,18 @@
+source:
+- url: github.com/elek/ozone-flekszible
 import:
+ - path: ../flekszible
  - path: ozone
    transformations:
    - type: image
-     image: flokkr/ozone:dev-114ff4180
+     image: flokkr/ozone:0.5.0-beta
    - type: ozone/onenode
-   - type: ozone/persistence
+   - type: ozone/memdisk
    - type: add
+     trigger:
+       metadata:
+         name: ozone-config
      path:
-       - spec
-       - template
-       - spec
-       - containers
-       - ".*"
+       - data
      value:
-        imagePullPolicy: IfNotPresent
- 
+       OZONE-SITE.XML_ozone.scm.container.size: 1GB
