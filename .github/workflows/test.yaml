@@ -6,6 +6,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Install robotframework
+        run: sudo pip install robotframework
       - name: Install k3s
         run: curl -sfL https://get.k3s.io | sh -
       - name: Copy kubeconfig
